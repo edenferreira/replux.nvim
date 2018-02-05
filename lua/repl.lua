@@ -6,8 +6,61 @@ local cache_file = cache_dir .. '/myrepl_projects'
 local dev_dir = os.getenv('HOME') .. '/dev'
 local dev_nu_dir = dev_dir .. '/nu'
 
+function lines_from(file)
+    local lines = {}
+    local count = 1
+    for line in io.lines(file) do
+        lines[count] = line
+        count = count + 1
+    end
+    return lines
+end
+
+function write_lines_to(lines, path)
+    local file = io.open(path, 'w')
+    for _, line in pairs(lines) do
+        file:write(line, '\n')
+    end
+end
+
+function cache_data(cache_file)
+    local success, result = pcall(lines_from, cache_file)
+    if success then
+        return result
+    end
+    return nil
+end
+
+function all_projects_without_cache()
+    local result = io.popen('find ' .. dev_dir)
+    local projects = map_pairs(
+    function (str)
+        return string.sub(str, 1, string.find(str, '/project.clj') - 1)
+    end,
+    filter(function (str)
+        return string.find(str, 'project.clj')
+    end, result:lines()))
+    return projects
+end
+
+function all_projects ()
+    local script_dir = vim.api.nvim_eval("expand(\"<sfile>:p:h\")")
+    local cache_dir = script_dir .. '/cache'
+    local cache_file = cache_dir .. '/repl_projects'
+
+    local cache = cache_data(cache_file)
+    if cache then return cache end
+    local result = io.popen('find ' .. dev_dir)
+    return projects
+end
+
 module.api.create_cache = function ()
     local script_dir = vim.api.nvim_eval("expand(\"<sfile>:p:h\")")
+    local cache_dir = script_dir .. '/cache'
+    io.popen('mkdir -p ' .. cache_dir)
+    local cache_file = cache_dir .. '/repl_projects'
+    local projects = all_projects_without_cache()
+    write_lines_to(projects, cache_file)
     return script_dir
 end
 
@@ -49,54 +102,8 @@ function print_all(iter)
     end
 end
 
-function lines_from(file)
-    local lines = {}
-    local count = 1
-    for line in io.lines(file) do
-        lines[count] = line
-        count = count + 1
-    end
-    return lines
-end
-
-function write_lines_to(lines, path)
-    local file = io.open(path, 'w')
-    for _, line in pairs(lines) do
-        file:write(line, '\n')
-    end
-end
-
-function cache_data()
-    local success, result = pcall(lines_from, cache_file)
-    if success then
-        return result
-    end
-    return nil
-end
-
 function run(cmd)
     return io.popen(cmd .. ' 2>&1'):read('*a')
-end
-
-function all_projects_without_cache()
-    local result = io.popen('find ' .. dev_dir)
-    local projects = map_pairs(
-    function (str)
-        return string.sub(str, 1, string.find(str, '/project.clj') - 1)
-    end,
-    filter(function (str)
-        return string.find(str, 'project.clj')
-    end, result:lines()))
-    return projects
-end
-
-function all_projects ()
-    local cache = cache_data()
-    if cache then return cache end
-    local result = io.popen('find ' .. dev_dir)
-    local projects = all_projects_without_cache()
-    write_lines_to(projects, cache_file)
-    return projects
 end
 
 function startswith(str, start)
