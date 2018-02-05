@@ -1,28 +1,17 @@
-local luamodule = {}
-
-luamodule.showstuff = function ()
-    print "hello from nvim-example-lua-plugin.luamodule.showstuff HAHA"
-end
-
-function comment()
-    eolComment = "%-%-"
-    buf = vim.api.nvim_get_current_buf()
-    print("this is the thing")
-    --vim.api.echo(buf)
-    --a, b = string.find(line, "^%s" .. eolComment)
-    --if a == nil then
-    --    -- Add a leading comment.
-    --else
-    --    -- Remove the leading comment.
-    --end
-end
+local module = {}
+module.api = {}
 
 local cache_dir = os.getenv('HOME') .. '/dotfiles/cache'
 local cache_file = cache_dir .. '/myrepl_projects'
 local dev_dir = os.getenv('HOME') .. '/dev'
 local dev_nu_dir = dev_dir .. '/nu'
 
-local map_pairs = function (fn, iter)
+module.api.create_cache = function ()
+    local script_dir = vim.api.nvim_eval("expand(\"<sfile>:p:h\")")
+    return script_dir
+end
+
+function map_pairs(fn, iter)
     local result = {}
     local count = 1
     for _, line in pairs(iter) do
@@ -32,7 +21,7 @@ local map_pairs = function (fn, iter)
     return result
 end
 
-local map = function (fn, iter)
+function map(fn, iter)
     local result = {}
     local count = 1
     for line in iter do
@@ -42,7 +31,7 @@ local map = function (fn, iter)
     return result
 end
 
-local filter = function (fn, iter)
+function filter(fn, iter)
     local result = {}
     local count = 1
     for line in iter do
@@ -89,7 +78,7 @@ function run(cmd)
     return io.popen(cmd .. ' 2>&1'):read('*a')
 end
 
-local all_projects_without_cache = function ()
+function all_projects_without_cache()
     local result = io.popen('find ' .. dev_dir)
     local projects = map_pairs(
     function (str)
@@ -101,7 +90,7 @@ local all_projects_without_cache = function ()
     return projects
 end
 
-local all_projects = function ()
+function all_projects ()
     local cache = cache_data()
     if cache then return cache end
     local result = io.popen('find ' .. dev_dir)
@@ -128,7 +117,7 @@ function start_path(path)
     return name .. ' started'
 end
 
-function kill_path(path)
+module.kill_path = function (path)
     objProp = {}
     index = 1
     for value in string.gmatch(path, "%w+") do
@@ -142,20 +131,20 @@ function kill_path(path)
     return name .. ' killed'
 end
 
-function start(name)
+module.start = function (name)
     local path = dev_nu_dir .. '/' .. name
     local cmd = 'tmux new-session -d -s ' .. name .. ' -c ' .. path .. ' lein repl'
     run(cmd)
     return name .. ' started'
 end
 
-function kill(name)
+module.kill = function (name)
     local cmd = 'tmux kill-session -t ' .. name
     run(cmd)
     return name .. ' killed'
 end
 
-function kill_from(path)
+module.kill_from = function (path)
     local projects = all_projects()
     for i, value in pairs(projects) do
         if startswith(path, value) then
@@ -164,17 +153,17 @@ function kill_from(path)
     end
 end
 
-function ls()
+module.ls = function ()
     local result = io.popen('tmux ls 2>&1')
     local list = map(
-        function (line)
-            return string.match(line, '(%a+):')
-        end,
-        result:lines())
+    function (line)
+        return string.match(line, '(%a+):')
+    end,
+    result:lines())
     return list
 end
 
-luamodule.startreplfrom =  function (path)
+module.startreplfrom =  function (path)
     local projects = all_projects()
     for i, value in pairs(projects) do
         if startswith(path, value) then
@@ -183,4 +172,4 @@ luamodule.startreplfrom =  function (path)
     end
 end
 
-return luamodule
+return module

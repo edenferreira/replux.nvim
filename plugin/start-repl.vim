@@ -3,5 +3,6 @@ function! s:StartRepl()
     return luaeval('require("repl").startreplfrom(_A.from)', {'from': l:from})
 endfunction
 
-command! -nargs=0 ShowStuff lua require('repl').showstuff()
+echom luaeval('require("repl").api.create_cache()', {})
+
 command! -nargs=0 StartRepl call s:StartRepl()
