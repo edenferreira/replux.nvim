@@ -2,8 +2,16 @@ function! s:RepluxStart()
     echom luaeval('require("core").start_from()')
 endfunction
 
+function! s:RepluxStartSilent()
+    call luaeval('require("core").start_from()')
+endfunction
+
 function! s:RepluxRestart()
     echom luaeval('require("core").restart_from()')
+endfunction
+
+function! s:RepluxRestartSilent()
+    call luaeval('require("core").restart_from()')
 endfunction
 
 function! s:RepluxKill()
@@ -27,7 +35,9 @@ endfunction
 
 
 command! -nargs=0 RepluxStart call s:RepluxStart()
+command! -nargs=0 RepluxStartSilent call s:RepluxStartSilent()
 command! -nargs=0 RepluxRestart call s:RepluxRestart()
+command! -nargs=0 RepluxRestartSilent call s:RepluxRestartSilent()
 command! -nargs=0 RepluxKill call s:RepluxKill()
 command! -nargs=1 RepluxKillByName call s:RepluxKillByName(<f-args>)
 command! -nargs=0 RepluxLs call s:RepluxLs()
