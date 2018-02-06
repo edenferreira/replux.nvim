@@ -29,9 +29,10 @@ end
 
 module.create_cache = function ()
   local projects = utils.all_projects()
-  io.popen('mkdir -p ' .. module.options.cache_dir)
+  io.popen('mkdir -p ' .. module.options.cache_dir):read('*a')
   local cache_file = module.options.cache_dir .. '/repls_cache'
   utils.write_lines_to(projects, cache_file)
+  return 'cache created in ' .. cache_file
 end
 
 module.start_from = function (path)
