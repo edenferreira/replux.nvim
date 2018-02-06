@@ -87,6 +87,7 @@ module.write_lines_to = function (lines, path)
   for _, line in pairs(lines) do
     file:write(line, '\n')
   end
+  file:close()
 end
 
 module.starts_with = function (str, start)
