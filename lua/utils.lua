@@ -20,6 +20,12 @@ module.map = function (fn, iter)
       count = count + 1
     end
     return result
+  elseif type(iter) == 'userdata' then
+    for line in iter:lines() do
+      result[count] = fn(line)
+      count = count + 1
+    end
+    return result
   end
   return nil
 end
@@ -108,7 +114,7 @@ module.path_name = function (path)
 end
 
 module.run = function (cmd)
-  return io.popen(cmd .. ' 2>&1'):read('*a')
+  return io.popen(cmd .. ' 2>&1')
 end
 
 return module

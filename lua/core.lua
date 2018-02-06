@@ -42,4 +42,34 @@ module.start_from = function (path)
   return name .. ' started'
 end
 
+module.kill_by_name = function (name)
+  local cmd = 'tmux kill-session -t ' .. name
+  utils.run(cmd)
+  return name .. ' killed'
+end
+
+module.kill_from = function (path)
+  local project = find_project(path)
+  local name = utils.path_name(project)
+  local cmd = 'tmux kill-session -t ' .. name
+  utils.run(cmd)
+  return name .. ' killed'
+end
+
+module.restart_from = function (path)
+  module.kill_from(path)
+  module.start_from(path)
+  local project = find_project(path)
+  local name = utils.path_name(project)
+  return name .. ' restarted'
+end
+
+module.ls = function ()
+  local cmd = 'tmux ls'
+  local result = utils.run(cmd)
+  return utils.map(function (line)
+    return line:match('(%a+):')
+  end, result)
+end
+
 return module
