@@ -7,7 +7,7 @@ This is just a test for now, working just for clojure with leiningen.
 ------------
 [vim-plug](https://github.com/junegunn/vim-plug)
 
-`Plug 'edenferreira/replux'`
+`Plug 'edenferreira/replux', {'do': ':RepluxCacheProjects'}`
 
 ## TODO
 ------------

@@ -118,4 +118,8 @@ module.run = function (cmd)
   return io.popen(cmd .. ' 2>&1')
 end
 
+module.vim_expand = function (str)
+  return vim.api.nvim_eval('expand("' .. str .. '")')
+end
+
 return module
