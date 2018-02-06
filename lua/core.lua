@@ -3,7 +3,7 @@ local module = {}
 
 local function default_cache_dir()
   local plugin_dir = utils.find(function (plugin)
-    return plugin:find('start%-repl')
+    return plugin:find('replux')
   end,
   utils.all_runtime_files())
 
