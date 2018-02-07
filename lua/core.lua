@@ -31,9 +31,15 @@ local function all_projects()
 end
 
 local function find_project(path)
-  return utils.find(function (proj)
+  local project = utils.find(function (proj)
     return utils.starts_with(path, proj)
   end, all_projects())
+
+  if project then
+    return project
+  else
+    return utils.all_projects()
+  end
 end
 
 module.create_cache = function ()
@@ -47,10 +53,14 @@ end
 module.start_from = function ()
   local path = utils.vim_expand('%:p')
   local project = find_project(path)
-  local name = utils.path_name(project)
-  local cmd = 'tmux new-session -d -s ' .. name .. ' -c ' .. project .. ' lein repl'
-  utils.run(cmd)
-  return name .. ' started'
+  if project then
+    local name = utils.path_name(project)
+    local cmd = 'tmux new-session -d -s ' .. name .. ' -c ' .. project .. ' lein repl'
+    utils.run(cmd)
+    return name .. ' started'
+  else
+    return 'project not found for the path'
+  end
 end
 
 module.kill_by_name = function (name)
@@ -62,10 +72,14 @@ end
 module.kill_from = function ()
   local path = utils.vim_expand('%:p')
   local project = find_project(path)
-  local name = utils.path_name(project)
-  local cmd = 'tmux kill-session -t ' .. name
-  utils.run(cmd)
-  return name .. ' killed'
+  if project then
+    local name = utils.path_name(project)
+    local cmd = 'tmux kill-session -t ' .. name
+    utils.run(cmd)
+    return name .. ' killed'
+  else
+    return ' project not found for the path'
+  end
 end
 
 module.restart_from = function ()
@@ -73,8 +87,12 @@ module.restart_from = function ()
   module.start_from()
   local path = utils.vim_expand('%:p')
   local project = find_project(path)
-  local name = utils.path_name(project)
-  return name .. ' restarted'
+  if project then
+    local name = utils.path_name(project)
+    return name .. ' restarted'
+  else
+    return 'project not found for the path'
+  end
 end
 
 module.ls = function ()
