@@ -31,15 +31,9 @@ local function all_projects()
 end
 
 local function find_project(path)
-  local project = utils.find(function (proj)
+  return utils.find(function (proj)
     return utils.starts_with(path, proj)
   end, all_projects())
-
-  if project then
-    return project
-  else
-    return utils.all_projects()
-  end
 end
 
 module.create_cache = function ()
@@ -59,7 +53,7 @@ module.start_from = function ()
     utils.run(cmd)
     return name .. ' started'
   else
-    return 'project not found for the path'
+    return 'project not found for the path ' .. path
   end
 end
 
@@ -78,7 +72,7 @@ module.kill_from = function ()
     utils.run(cmd)
     return name .. ' killed'
   else
-    return ' project not found for the path'
+    return ' project not found for the path ' .. path
   end
 end
 
@@ -91,7 +85,7 @@ module.restart_from = function ()
     local name = utils.path_name(project)
     return name .. ' restarted'
   else
-    return 'project not found for the path'
+    return 'project not found for the path ' .. path
   end
 end
 
@@ -101,6 +95,12 @@ module.ls = function ()
   return utils.map(function (line)
     return line:match('(%a+):')
   end, result)
+end
+
+module.kill_all = function ()
+  for _, name in pairs(module.ls()) do
+    module.kill_by_name(name)
+  end
 end
 
 return module

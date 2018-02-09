@@ -3,7 +3,7 @@ function! s:RepluxStart()
 endfunction
 
 function! s:RepluxStartSilent()
-    call luaeval('require("core").start_from()')
+    return luaeval('require("core").start_from()')
 endfunction
 
 function! s:RepluxRestart()
@@ -11,7 +11,7 @@ function! s:RepluxRestart()
 endfunction
 
 function! s:RepluxRestartSilent()
-    call luaeval('require("core").restart_from()')
+    return luaeval('require("core").restart_from()')
 endfunction
 
 function! s:RepluxKill()
@@ -29,6 +29,10 @@ function! s:RepluxLs()
     endfor
 endfunction
 
+function! s:RepluxKillAll()
+    return luaeval('require("core").kill_all()', {})
+endfunction
+
 function! s:RepluxCacheProjects()
     echom luaeval('require("core").create_cache()', {})
 endfunction
@@ -41,4 +45,5 @@ command! -nargs=0 RepluxRestartSilent call s:RepluxRestartSilent()
 command! -nargs=0 RepluxKill call s:RepluxKill()
 command! -nargs=1 RepluxKillByName call s:RepluxKillByName(<f-args>)
 command! -nargs=0 RepluxLs call s:RepluxLs()
+command! -nargs=0 RepluxKillAll call s:RepluxKillAll()
 command! -nargs=0 RepluxCacheProjects call s:RepluxCacheProjects()
